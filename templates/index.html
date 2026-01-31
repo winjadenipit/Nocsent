@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Panel UI</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <!-- Main Panel -->
+        <div class="panel">
+            <!-- Video/Content Area -->
+            <div class="video-area" id="videoArea">
+                <!-- Camera Page -->
+                <div class="page-content" id="cameraPage">
+                    <img id="cameraFeed" class="camera-feed" alt="Camera Feed">
+                    <div class="placeholder" id="cameraPlaceholder">
+                        <p>Webcam Unavailable</p>
+                        <p>(Click Record to start)</p>
+                    </div>
+
+                    <!-- Alarm display at top right -->
+                    <div class="alarm-display" id="alarmDisplay" style="display: none;"></div>
+
+                    <!-- Recording indicator -->
+                    <div class="rec-indicator" id="recIndicator" style="display: none;">
+                        <div class="rec-dot"></div>
+                        <span>REC</span>
+                    </div>
+
+                    <!-- Record button -->
+                    <button class="record-btn" id="recordBtn">
+                        <span class="btn-icon">⏺</span> Record
+                    </button>
+                </div>
+
+                <!-- Alarm Page -->
+                <div class="page-content" id="alarmPage" style="display: none;">
+                    <div class="alarm-display top-right" id="alarmDisplayAlarm" style="display: none;"></div>
+
+                    <h1 class="page-title">ALARM</h1>
+
+                    <div class="alarm-panel">
+                        <!-- Hour Spinbox -->
+                        <div class="spinbox">
+                            <div class="spinbox-display">
+                                <span class="spinbox-value" id="hourValue">00</span>
+                            </div>
+                            <div class="spinbox-buttons">
+                                <button class="spinbox-btn spinbox-up" onclick="adjustAlarm('hour', 1)">
+                                    <span class="triangle-up"></span>
+                                </button>
+                                <button class="spinbox-btn spinbox-down" onclick="adjustAlarm('hour', -1)">
+                                    <span class="triangle-down"></span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Colon separator -->
+                        <div class="time-separator">
+                            <div class="dot"></div>
+                            <div class="dot"></div>
+                        </div>
+
+                        <!-- Minute Spinbox -->
+                        <div class="spinbox">
+                            <div class="spinbox-display">
+                                <span class="spinbox-value" id="minuteValue">00</span>
+                            </div>
+                            <div class="spinbox-buttons">
+                                <button class="spinbox-btn spinbox-up" onclick="adjustAlarm('minute', 1)">
+                                    <span class="triangle-up"></span>
+                                </button>
+                                <button class="spinbox-btn spinbox-down" onclick="adjustAlarm('minute', -1)">
+                                    <span class="triangle-down"></span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Labels -->
+                    <div class="spinbox-labels">
+                        <span>HOUR</span>
+                        <span>MINUTE</span>
+                    </div>
+
+                    <!-- Done button -->
+                    <button class="done-btn" id="doneBtn" onclick="setAlarm()">
+                        <span>✓</span> Done
+                    </button>
+                </div>
+
+                <!-- Video Page -->
+                <div class="page-content" id="videoPage" style="display: none;">
+                    <div class="alarm-display top-right" id="alarmDisplayVideo" style="display: none;"></div>
+
+                    <h1 class="page-title" id="videoTitle">VIDEO : 25/13/2024</h1>
+
+                    <img src="/static/images/video-placeholder.jpg" class="video-placeholder" alt="Video">
+
+                    <!-- Playback controls -->
+                    <div class="playback-controls">
+                        <button class="playback-btn">⏮</button>
+                        <button class="playback-btn">▶</button>
+                        <button class="playback-btn">⏸</button>
+                    </div>
+
+                    <!-- Progress bar -->
+                    <div class="progress-container">
+                        <span class="time-label">6:15</span>
+                        <div class="progress-bar">
+                            <div class="progress-line"></div>
+                            <div class="progress-thumb" style="left: 70%;"></div>
+                        </div>
+                        <span class="time-label">8:34</span>
+                    </div>
+                </div>
+
+                <!-- Brightness Scrollbar (Left) -->
+                <div class="scrollbar left-scroll">
+                    <div class="scroll-icon">☼</div>
+                    <div class="scroll-track">
+                        <div class="scroll-thumb" id="brightnessThumb" style="top: 50%;"></div>
+                    </div>
+                    <input type="range" class="scroll-input" id="brightnessInput"
+                           min="0" max="100" value="50" orient="vertical">
+                </div>
+
+                <!-- Volume Scrollbar (Right) -->
+                <div class="scrollbar right-scroll">
+                    <div class="scroll-icon">🔇</div>
+                    <div class="scroll-track">
+                        <div class="scroll-thumb" id="volumeThumb" style="top: 50%;"></div>
+                    </div>
+                    <input type="range" class="scroll-input" id="volumeInput"
+                           min="0" max="100" value="50" orient="vertical">
+                </div>
+            </div>
+
+            <!-- Bottom Bar -->
+            <div class="bottom-bar">
+                <!-- Navigation Buttons -->
+                <div class="nav-buttons">
+                    <button class="nav-btn active" id="btnCamera" onclick="switchPage('camera')">
+                        Camera
+                    </button>
+                    <button class="nav-btn" id="btnAlarm" onclick="switchPage('alarm')">
+                        Alarm
+                    </button>
+                    <button class="nav-btn" id="btnVideo" onclick="switchPage('video')">
+                        Video
+                    </button>
+                </div>
+
+                <!-- Date/Time/Temperature Card -->
+                <div class="info-card">
+                    <div class="date" id="dateDisplay">--/--/----</div>
+                    <div class="time-temp">
+                        <span class="time" id="timeDisplay">--:--</span>
+                        <span class="temp" id="tempDisplay">--.-°C</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>
